@@ -21,29 +21,27 @@ type Sprite struct {
 	src.Attribute
 	active bool
 	shape  *sdl.Rect
+	body   *body.Body
 	color  uint32
 }
 
-func NewSprite(color uint32) *Sprite {
+func NewSprite(color uint32, b *body.Body) *Sprite {
 	attr := new(Sprite)
 	attr.color = color
+	attr.body = b
 	return attr
 }
 func (s *Sprite) GetName() string {
 	return "sprite"
 }
+
 func (s *Sprite) SetColor(c uint32) {
 	s.color = c
 }
-func (attr *Sprite) Init(obj src.GameObjectInterface) {
-	if obj.GetAttr("body") == nil {
-		pos := body.NewBody(0, 0, 0, 0)
-		obj.AddAttr(pos)
-	}
-}
 
 func (attr *Sprite) Update(obj src.GameObjectInterface) {
-	surface := src.GetSurface()
-	b := obj.GetAttr("body").(*body.Body)
-	surface.FillRect(&sdl.Rect{int32(b.X), int32(b.Y), int32(b.W), int32(b.H)}, attr.color)
+	addDrawQueue(attr.body.Z,
+		&sdl.Rect{int32(attr.body.X), int32(attr.body.Y), int32(attr.body.W), int32(attr.body.H)},
+		attr.color,
+	)
 }

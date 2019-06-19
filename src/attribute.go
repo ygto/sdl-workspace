@@ -9,6 +9,9 @@ type AttributeInterface interface {
 type Attribute struct {
 }
 
+func (attr *Attribute) Init(obj GameObjectInterface) {
+
+}
 func (attr *Attribute) BeforeUpdate(obj GameObjectInterface) {
 
 }

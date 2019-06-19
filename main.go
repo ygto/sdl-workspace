@@ -3,6 +3,7 @@ package main
 import (
 	"./app/scenes"
 	"./src"
+	"./src/attributes/sprite"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -31,16 +32,13 @@ func main() {
 	window.UpdateSurface()
 
 	director := src.NewDirector()
-
 	src.SetDirector(director)
 
 	director.AddScene(scenes.MainScene())
-
 	director.SetActiveScene("main")
 
 	running := true
 	for running {
-		surface.FillRect(nil, 0)
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
 			case *sdl.QuitEvent:
@@ -50,7 +48,6 @@ func main() {
 			}
 		}
 		director.Update()
-		window.UpdateSurface()
-
+		sprite.Draw()
 	}
 }

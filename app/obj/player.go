@@ -12,36 +12,32 @@ type Player struct {
 	acc float32
 }
 
-func NewPlayer(b *body.Body) *Player {
-	p := new(Player)
-	p.GameObject = src.NewGameObject()
-	p.acc = 0.05
-
-	p.AddAttr(b)
-
-	s := sprite.NewSprite(sprite.GREEN)
-	p.AddAttr(s)
-
-	c := collision.NewCollision(b, 1, "player")
-	p.AddAttr(c)
-
-	return p
+func (p *Player) Collision() *collision.Collision {
+	return p.GetAttr("collision").(*collision.Collision)
+}
+func (p *Player) Body() *body.Body {
+	return p.GetAttr("body").(*body.Body)
 }
 
-func (player *Player) Update() {
+func NewPlayer(b *body.Body) *Player {
+	obj := new(Player)
+	obj.GameObject = src.NewGameObject()
+	obj.acc = 0.05
 
-	b := player.GetAttr("body").(*body.Body)
+	obj.AddAttr(b)
 
-	col := player.GetAttr("collision").(*collision.Collision)
-	if col.TagCollision("wall") != nil {
-		player.acc *= -1
+	s := sprite.NewSprite(sprite.GREEN, b)
+	obj.AddAttr(s)
+
+	c := collision.NewCollision(b, "player")
+	obj.AddAttr(c)
+
+	return obj
+}
+
+func (obj *Player) Update() {
+	if obj.Collision().TagCollision("wall") != nil {
+		obj.acc *= -1
 	}
-	if b.X < -1 {
-		player.acc *= -1
-	}
-	b.X += player.acc
-
-	/*if b.X > 199 && src.GetDirector().GetActiveScene().GetName() != "second" {
-		src.GetDirector().SetActiveScene("second")
-	}*/
+	obj.Body().X += obj.acc
 }

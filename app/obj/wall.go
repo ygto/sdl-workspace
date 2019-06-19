@@ -17,10 +17,10 @@ func NewWall(b *body.Body) *Wall {
 
 	obj.AddAttr(b)
 
-	s := sprite.NewSprite(sprite.GetColor(0xff, 0xaa, 0x01))
+	s := sprite.NewSprite(sprite.GetColor(0xff, 0xaa, 0x01), b)
 	obj.AddAttr(s)
 
-	c := collision.NewCollision(b, 1, "wall")
+	c := collision.NewCollision(b, "wall")
 	obj.AddAttr(c)
 
 	return obj
