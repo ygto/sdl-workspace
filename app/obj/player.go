@@ -2,7 +2,8 @@ package obj
 
 import (
 	"../../src"
-	"../../src/attributes/position"
+	"../../src/attributes/body"
+	"../../src/attributes/collision"
 	"../../src/attributes/sprite"
 )
 
@@ -11,33 +12,36 @@ type Player struct {
 	acc float32
 }
 
-func NewPlayer() *Player {
+func NewPlayer(b *body.Body) *Player {
 	p := new(Player)
 	p.GameObject = src.NewGameObject()
 	p.acc = 0.05
 
-	pos := position.NewPosition(0, 100)
-	p.AddAttr(pos)
+	p.AddAttr(b)
 
-	s := sprite.NewSprite(10, 10)
+	s := sprite.NewSprite(sprite.GREEN)
 	p.AddAttr(s)
+
+	c := collision.NewCollision(b, 1, "player")
+	p.AddAttr(c)
 
 	return p
 }
 
 func (player *Player) Update() {
 
-	pos := player.GetAttr("position").(*position.Position)
-	pos.X += player.acc
+	b := player.GetAttr("body").(*body.Body)
 
-	if pos.X > 200 {
+	col := player.GetAttr("collision").(*collision.Collision)
+	if col.TagCollision("wall") != nil {
 		player.acc *= -1
 	}
-	if pos.X < -1 {
+	if b.X < -1 {
 		player.acc *= -1
 	}
+	b.X += player.acc
 
-	if pos.X > 199 && src.GetDirector().GetActiveScene().GetName() != "second" {
+	/*if b.X > 199 && src.GetDirector().GetActiveScene().GetName() != "second" {
 		src.GetDirector().SetActiveScene("second")
-	}
+	}*/
 }

@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -34,10 +35,8 @@ func main() {
 	src.SetDirector(director)
 
 	director.AddScene(scenes.MainScene())
-	director.AddScene(scenes.SecondScene())
 
 	director.SetActiveScene("main")
-
 
 	running := true
 	for running {

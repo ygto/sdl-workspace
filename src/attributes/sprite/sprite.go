@@ -1,45 +1,49 @@
 package sprite
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"encoding/binary"
+	"github.com/veandco/go-sdl2/sdl"
+)
 import "../../../src"
-import "../position"
+import "../body"
 
-type Sprite struct {
-	active bool
-	shape  *sdl.Rect
-	size   struct {
-		W int32
-		H int32
-	}
+const (
+	RED   = 0xffff0000
+	GREEN = 0xff00ff00
+	BLUE  = 0xff0000ff
+)
+
+func GetColor(red byte, green byte, blue byte) uint32 {
+	return binary.BigEndian.Uint32([]byte{0xff, red, green, blue})
 }
 
-func NewSprite(w int32, h int32) *Sprite {
+type Sprite struct {
+	src.Attribute
+	active bool
+	shape  *sdl.Rect
+	color  uint32
+}
+
+func NewSprite(color uint32) *Sprite {
 	attr := new(Sprite)
-	attr.size.W = w
-	attr.size.H = h
+	attr.color = color
 	return attr
 }
 func (s *Sprite) GetName() string {
 	return "sprite"
 }
+func (s *Sprite) SetColor(c uint32) {
+	s.color = c
+}
 func (attr *Sprite) Init(obj src.GameObjectInterface) {
-
-	if obj.GetAttr("position") == nil {
-		pos := position.NewPosition(0, 0)
+	if obj.GetAttr("body") == nil {
+		pos := body.NewBody(0, 0, 0, 0)
 		obj.AddAttr(pos)
 	}
-
-	surface := src.GetSurface()
-
-	x, y := obj.GetAttr("position").(*position.Position).GetPosition()
-
-	surface.FillRect(&sdl.Rect{int32(x), int32(y), attr.size.W, attr.size.H}, 0xffff0000)
 }
 
 func (attr *Sprite) Update(obj src.GameObjectInterface) {
-
-	x, y := obj.GetAttr("position").(*position.Position).GetPosition()
-
 	surface := src.GetSurface()
-	surface.FillRect(&sdl.Rect{int32(x), int32(y), attr.size.W, attr.size.H}, 0xffff0000)
+	b := obj.GetAttr("body").(*body.Body)
+	surface.FillRect(&sdl.Rect{int32(b.X), int32(b.Y), int32(b.W), int32(b.H)}, attr.color)
 }
