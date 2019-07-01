@@ -39,11 +39,22 @@ func (attr *Collision) TagCollision(tag string) *Collision {
 		}
 	}
 
+	for col, _ := range items {
+		if attr.body == col.body || attr.body.Layer != col.body.Layer {
+			continue
+		}
+
+		if collisionDetection(attr.body, col.body) {
+			attr.collisions[col] = col.GetTag()
+			return col
+		}
+	}
+
 	return nil
 }
 func (attr *Collision) Init(obj src.GameObjectInterface) {
 	if obj.GetAttr("body") == nil {
-		pos := body.NewBody(0, 0, 0, 0, 0)
+		pos := body.NewBody("", 0, 0, 0, 0, 0)
 		obj.AddAttr(pos)
 	}
 	items[attr] = true
@@ -51,15 +62,6 @@ func (attr *Collision) Init(obj src.GameObjectInterface) {
 
 func (attr *Collision) BeforeUpdate(obj src.GameObjectInterface) {
 	attr.collisions = make(map[*Collision]string)
-	for col, _ := range items {
-		if attr.body == col.body || attr.body.Z != col.body.Z {
-			continue
-		}
-
-		if collisionDetection(attr.body, col.body) {
-			attr.collisions[col] = col.GetTag()
-		}
-	}
 }
 func collisionDetection(b1 *body.Body, b2 *body.Body) bool {
 	return b1.X < b2.X+b2.W &&

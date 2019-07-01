@@ -6,27 +6,38 @@ import (
 	"sort"
 )
 
-var rects = make(map[float32]map[*sdl.Rect]uint32)
+type drawCollect []*draw
 
-func addDrawQueue(layer float32, rect *sdl.Rect, color uint32) {
-	if _, ok := rects[layer]; !ok {
-		rects[layer] = make(map[*sdl.Rect]uint32)
-	}
-	rects[layer][rect] = color
+type draw struct {
+	*sdl.Rect
+	color uint32
+	z     float32
 }
+
+func (d drawCollect) Len() int {
+	return len(d)
+}
+func (d drawCollect) Swap(i, j int) {
+	d[i], d[j] = d[j], d[i]
+}
+func (d drawCollect) Less(i, j int) bool {
+	return d[i].z < d[j].z
+}
+
+var draws = make(drawCollect, 0, 0)
+
+func addDrawQueue(z float32, rect *sdl.Rect, color uint32) {
+	d := draw{rect, color, z}
+	draws = append(draws, &d)
+}
+
 func Draw() {
-	keys := []int{}
-	for k := range rects {
-		keys = append(keys, int(k))
-	}
-	sort.Ints(keys)
+	sort.Sort(draws)
 	surface := src.GetSurface()
 	surface.FillRect(nil, 0)
-	for k := range keys {
-		for rect, color := range rects[float32(k)] {
-			surface.FillRect(rect, color)
-		}
+	for _, d := range draws {
+		surface.FillRect(d.Rect, d.color)
 	}
 	src.GetWindow().UpdateSurface()
-	rects = make(map[float32]map[*sdl.Rect]uint32)
+	draws = make(drawCollect, 0, 0)
 }

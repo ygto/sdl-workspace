@@ -4,6 +4,7 @@ import (
 	"./app/scenes"
 	"./src"
 	"./src/attributes/sprite"
+	"./src/event"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -39,14 +40,20 @@ func main() {
 
 	running := true
 	for running {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
+		//event.FlushKeyboard()
+		for e := sdl.PollEvent(); e != nil; e = sdl.PollEvent() {
+			switch e.(type) {
 			case *sdl.QuitEvent:
 				println("Quit")
 				running = false
 				break
+			case *sdl.KeyboardEvent:
+				event.FillKeyboard(e.(*sdl.KeyboardEvent))
+				break
+			default:
 			}
 		}
+
 		director.Update()
 		sprite.Draw()
 	}

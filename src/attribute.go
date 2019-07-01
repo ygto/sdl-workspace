@@ -5,6 +5,7 @@ type AttributeInterface interface {
 	Init(obj GameObjectInterface)
 	BeforeUpdate(obj GameObjectInterface)
 	Update(obj GameObjectInterface)
+	AfterUpdate(obj GameObjectInterface)
 }
 type Attribute struct {
 }
@@ -15,7 +16,9 @@ func (attr *Attribute) Init(obj GameObjectInterface) {
 func (attr *Attribute) BeforeUpdate(obj GameObjectInterface) {
 
 }
-
 func (attr *Attribute) Update(obj GameObjectInterface) {
+
+}
+func (attr *Attribute) AfterUpdate(obj GameObjectInterface) {
 
 }

@@ -5,11 +5,16 @@ import (
 	"../../src/attributes/body"
 	"../../src/attributes/collision"
 	"../../src/attributes/sprite"
+	"../../src/event"
 )
 
 type Player struct {
 	*src.GameObject
-	acc float32
+	accX      float32
+	accY      float32
+	speedLow  float32
+	speedFast float32
+	rollback  bool
 }
 
 func (p *Player) Collision() *collision.Collision {
@@ -21,8 +26,11 @@ func (p *Player) Body() *body.Body {
 
 func NewPlayer(b *body.Body) *Player {
 	obj := new(Player)
+
+	obj.speedLow = 0.05
+	obj.speedFast = 0.1
+
 	obj.GameObject = src.NewGameObject()
-	obj.acc = 0.05
 
 	obj.AddAttr(b)
 
@@ -36,8 +44,48 @@ func NewPlayer(b *body.Body) *Player {
 }
 
 func (obj *Player) Update() {
-	if obj.Collision().TagCollision("wall") != nil {
-		obj.acc *= -1
+
+	obj.accX = 0
+	obj.accY = 0
+
+	switch event.KeyDown(event.KEY_DOWN) {
+	case event.PRESSED:
+		obj.accY = obj.speedLow
+	case event.REPEATED:
+		obj.accY = obj.speedFast
 	}
-	obj.Body().X += obj.acc
+	switch event.KeyDown(event.KEY_UP) {
+	case event.PRESSED:
+		obj.accY = -obj.speedLow
+	case event.REPEATED:
+		obj.accY = -obj.speedFast
+	}
+
+	switch event.KeyDown(event.KEY_LEFT) {
+	case event.PRESSED:
+		obj.accX = -obj.speedLow
+	case event.REPEATED:
+		obj.accX = -obj.speedFast
+	}
+
+	switch event.KeyDown(event.KEY_RIGHT) {
+	case event.PRESSED:
+		obj.accX = obj.speedLow
+	case event.REPEATED:
+		obj.accX = obj.speedFast
+	}
+
+	obj.Body().X += obj.accX
+	obj.Body().Y += obj.accY
+
+	if obj.Collision().TagCollision("wall") != nil {
+		obj.rollback = true
+
+	}
+
+}
+func (obj *Player) AfterUpdate() {
+	if obj.rollback {
+		obj.Body().RevertChanges()
+	}
 }
