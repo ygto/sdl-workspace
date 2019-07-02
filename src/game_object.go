@@ -5,10 +5,12 @@ type GameObjectInterface interface {
 	GetAttr(name string) AttributeInterface
 	GetAttrs() map[string]AttributeInterface
 	Update()
-	AfterUpdate()
+	GetScene() *Scene
+	SetScene(s *Scene)
 }
 type GameObject struct {
 	Attributes map[string]AttributeInterface
+	s          *Scene
 }
 
 func NewGameObject() *GameObject {
@@ -17,6 +19,12 @@ func NewGameObject() *GameObject {
 	return obj
 }
 
+func (o *GameObject) GetScene() *Scene {
+	return o.s
+}
+func (o *GameObject) SetScene(s *Scene) {
+	o.s = s
+}
 func (o *GameObject) AddAttr(attr AttributeInterface) {
 	o.Attributes[attr.GetName()] = attr
 	attr.Init(o)
@@ -31,9 +39,7 @@ func (o *GameObject) GetAttr(name string) AttributeInterface {
 func (g *GameObject) Update() {
 
 }
-func (g *GameObject) AfterUpdate() {
 
-}
 func updateGameObject(obj GameObjectInterface) {
 	for _, attr := range obj.GetAttrs() {
 		attr.BeforeUpdate(obj)
@@ -47,4 +53,5 @@ func updateGameObject(obj GameObjectInterface) {
 	for _, attr := range obj.GetAttrs() {
 		attr.AfterUpdate(obj)
 	}
+
 }

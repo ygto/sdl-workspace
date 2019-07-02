@@ -7,19 +7,23 @@ import "../body"
 
 var items = make(map[*Collision]bool)
 
+func addItem(c *Collision) {
+	items[c] = true
+}
+
 type Collision struct {
 	src.Attribute
 	Tag        string
-	body       *body.Body
+	obj        src.GameObjectInterface
 	collisions map[*Collision]string
 }
 
-func NewCollision(b *body.Body, tag string) *Collision {
+func NewCollision(obj src.GameObjectInterface, tag string) *Collision {
 	c := new(Collision)
-	c.body = b
+	c.obj = obj
 	c.Tag = tag
 	c.collisions = make(map[*Collision]string)
-	items[c] = true
+	addItem(c)
 
 	return c
 }
@@ -33,18 +37,16 @@ func (attr *Collision) GetTag() string {
 
 func (attr *Collision) TagCollision(tag string) *Collision {
 
-	for c, t := range attr.collisions {
-		if tag == t {
-			return c
-		}
-	}
-
+	s := src.GetDirector().GetActiveScene()
 	for col, _ := range items {
-		if attr.body == col.body || attr.body.Layer != col.body.Layer {
+
+		if col.Tag != tag || col.obj.GetScene() != s {
 			continue
 		}
 
-		if collisionDetection(attr.body, col.body) {
+		attrBody := attr.obj.GetAttr("body").(*body.Body)
+		colBody := col.obj.GetAttr("body").(*body.Body)
+		if collisionDetection(attrBody, colBody) {
 			attr.collisions[col] = col.GetTag()
 			return col
 		}
@@ -54,10 +56,10 @@ func (attr *Collision) TagCollision(tag string) *Collision {
 }
 func (attr *Collision) Init(obj src.GameObjectInterface) {
 	if obj.GetAttr("body") == nil {
-		pos := body.NewBody("", 0, 0, 0, 0, 0)
+		pos := body.NewBody(0, 0, 0, 0, 0)
 		obj.AddAttr(pos)
 	}
-	items[attr] = true
+	addItem(attr)
 }
 
 func (attr *Collision) BeforeUpdate(obj src.GameObjectInterface) {

@@ -36,11 +36,12 @@ func main() {
 	src.SetDirector(director)
 
 	director.AddScene(scenes.MainScene())
+	director.AddScene(scenes.MenuScene())
 	director.SetActiveScene("main")
 
 	running := true
 	for running {
-		//event.FlushKeyboard()
+		event.FlushKeyboard()
 		for e := sdl.PollEvent(); e != nil; e = sdl.PollEvent() {
 			switch e.(type) {
 			case *sdl.QuitEvent:

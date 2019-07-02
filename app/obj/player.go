@@ -24,7 +24,7 @@ func (p *Player) Body() *body.Body {
 	return p.GetAttr("body").(*body.Body)
 }
 
-func NewPlayer(b *body.Body) *Player {
+func NewPlayer(layer string, b *body.Body) *Player {
 	obj := new(Player)
 
 	obj.speedLow = 0.05
@@ -37,7 +37,7 @@ func NewPlayer(b *body.Body) *Player {
 	s := sprite.NewSprite(sprite.GREEN, b)
 	obj.AddAttr(s)
 
-	c := collision.NewCollision(b, "player")
+	c := collision.NewCollision(obj, layer)
 	obj.AddAttr(c)
 
 	return obj
@@ -78,14 +78,7 @@ func (obj *Player) Update() {
 	obj.Body().X += obj.accX
 	obj.Body().Y += obj.accY
 
-	if obj.Collision().TagCollision("wall") != nil {
-		obj.rollback = true
-
-	}
-
-}
-func (obj *Player) AfterUpdate() {
-	if obj.rollback {
+	if c := obj.Collision().TagCollision("wall"); c != nil {
 		obj.Body().RevertChanges()
 	}
 }

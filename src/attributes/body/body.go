@@ -5,8 +5,6 @@ import (
 )
 
 type Body struct {
-	Layer string
-
 	src.Attribute
 	X float32
 	Y float32
@@ -22,17 +20,16 @@ type Body struct {
 	P_H float32
 }
 
-func NewBody(layer string, x float32, y float32, z float32, w float32, h float32) *Body {
+func NewBody(x float32, y float32, z float32, w float32, h float32) *Body {
 	attr := new(Body)
-	attr.SetBody(layer, x, y, z, w, h)
+	attr.SetBody(x, y, z, w, h)
 	return attr
 }
 func (attr *Body) GetName() string {
 	return "body"
 }
 
-func (attr *Body) SetBody(layer string, x float32, y float32, z float32, w float32, h float32) {
-	attr.Layer = layer
+func (attr *Body) SetBody(x float32, y float32, z float32, w float32, h float32) {
 	attr.X = x
 	attr.Y = y
 	attr.Z = z

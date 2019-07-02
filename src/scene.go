@@ -16,6 +16,7 @@ func (s *Scene) GetName() string {
 	return s.name
 }
 func (s *Scene) AddObj(o GameObjectInterface) {
+	o.SetScene(s)
 	s.objects = append(s.objects, o)
 }
 

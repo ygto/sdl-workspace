@@ -8,11 +8,16 @@ const KEY_RIGHT = uint32(79)
 const KEY_LEFT = uint32(80)
 const KEY_DOWN = uint32(81)
 const KEY_UP = uint32(82)
+const KEY_ENTER = uint32(40)
+const KEY_ESC = uint32(41)
+const KEY_SPACE = uint32(44)
 
 var keys = make(map[uint32]key)
+var deleteCodes = make(map[uint32]bool)
 
 type key struct {
-	Repeat bool
+	Repeat  bool
+	Release bool
 }
 
 func All() map[uint32]key {
@@ -21,7 +26,10 @@ func All() map[uint32]key {
 }
 
 func FlushKeyboard() {
-	keys = make(map[uint32]key)
+	for k := range deleteCodes {
+		delete(keys, k)
+		delete(deleteCodes, k)
+	}
 }
 
 func FillKeyboard(e *sdl.KeyboardEvent) {
@@ -33,7 +41,12 @@ func FillKeyboard(e *sdl.KeyboardEvent) {
 			Repeat: repeat,
 		}
 	} else {
-		delete(keys, code)
+		deleteCodes[code] = true
+
+		keys[code] = key{
+			Release: true,
+		}
+
 	}
 
 	//fmt.Println("t", e.Type, "s", e.State, "r", e.Repeat, "m", e.Keysym.Mod, "sc", e.Keysym.Scancode, "sym", e.Keysym.Sym)
@@ -42,14 +55,19 @@ func FillKeyboard(e *sdl.KeyboardEvent) {
 const NON_PRESSED = uint8(0)
 const PRESSED = uint8(1)
 const REPEATED = uint8(2)
+const RELEASED = uint8(3)
 
 func KeyDown(code uint32) uint8 {
+
 	k, ok := keys[code]
 	if !ok {
-		return 0
+		return NON_PRESSED
 	}
 	if k.Repeat {
-		return 2
+		return REPEATED
 	}
-	return 1
+	if k.Release {
+		return RELEASED
+	}
+	return PRESSED
 }

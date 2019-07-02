@@ -1,8 +1,9 @@
 package src
 
 type Director struct {
-	scenes      map[string]*Scene
-	activeScene string
+	scenes        map[string]*Scene
+	activeScene   string
+	creatingScene *Scene
 }
 
 func NewDirector() *Director {
@@ -16,6 +17,7 @@ func (d *Director) AddScene(s *Scene) {
 func (d *Director) SetActiveScene(name string) {
 	d.activeScene = name
 }
+
 func (d *Director) GetActiveScene() *Scene {
 	return d.scenes[d.activeScene]
 }
